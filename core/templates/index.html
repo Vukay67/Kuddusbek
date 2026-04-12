@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Усман Валюта — Обмен Валют</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Mulish:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#F5C518;--gold-light:#FFD93D;--gold-dim:#B8960C;
+  --navy:#07112A;--navy-mid:#0D1F45;--navy-light:#162B5C;
+  --text-light:#F0E6C8;--text-muted:#7a8db0;
+  --green:#27ae60;--red:#e74c3c;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Mulish',sans-serif;background:var(--navy);color:var(--text-light);overflow-x:hidden;}
+
+nav{position:sticky;top:0;z-index:200;display:flex;align-items:center;
+  justify-content:space-between;padding:10px 4vw;
+  background:rgba(7,17,42,.98);backdrop-filter:blur(20px);
+  border-bottom:2px solid var(--gold-dim);
+  box-shadow:0 4px 32px rgba(245,197,24,.25);}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-icon{width:48px;height:48px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-dim));
+  border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font-size:26px;box-shadow:0 4px 24px rgba(245,197,24,.6);flex-shrink:0;}
+.logo-text{font-family:'Playfair Display',serif;font-size:1.18rem;
+  color:var(--gold-light);font-weight:700;}
+.logo-sub{font-size:.56rem;letter-spacing:3px;text-transform:uppercase;color:var(--text-muted);}
+.nav-right{display:flex;align-items:center;gap:8px;}
+.dot-live{width:9px;height:9px;background:var(--green);
+  border-radius:50%;animation:pulse 2s infinite;box-shadow:0 0 8px #27ae60;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.6)}}
+.nav-clock{font-size:.78rem;color:var(--text-muted);font-weight:700;}
+.lang-switcher{display:flex;background:rgba(255,255,255,.05);
+  border:1.5px solid rgba(245,197,24,.35);border-radius:8px;overflow:hidden;}
+.lang-btn{padding:5px 12px;font-size:.75rem;font-weight:800;cursor:pointer;
+  border:none;background:transparent;color:var(--text-muted);
+  font-family:'Mulish',sans-serif;transition:all .2s;}
+.lang-btn.active{background:var(--gold);color:var(--navy);}
+.admin-lock-btn{background:none;border:1.5px solid rgba(245,197,24,.3);
+  border-radius:8px;padding:5px 11px;cursor:pointer;color:var(--text-muted);font-size:.9rem;}
+.admin-lock-btn:hover{color:var(--gold);border-color:rgba(245,197,24,.8);}
+
+.hero{position:relative;z-index:1;padding:52px 5vw 46px;text-align:center;
+  background:linear-gradient(160deg,var(--navy-mid),var(--navy-light) 60%,var(--navy-mid));
+  border-bottom:3px solid var(--gold-dim);overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 70% at 50% 0%,rgba(245,197,24,.18),transparent 65%);
+  pointer-events:none;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;
+  background:rgba(245,197,24,.14);border:1.5px solid rgba(245,197,24,.4);
+  border-radius:30px;padding:6px 18px;font-size:.73rem;font-weight:800;
+  letter-spacing:2px;text-transform:uppercase;color:var(--gold-light);margin-bottom:20px;}
+.hero-title{font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,5.5vw,3.2rem);color:#fff;
+  text-shadow:0 2px 28px rgba(245,197,24,.35);margin-bottom:10px;line-height:1.2;}
+.hero-title span{color:var(--gold-light);}
+.hero-sub{font-size:.93rem;color:var(--text-muted);max-width:500px;
+  margin:0 auto 30px;line-height:1.75;}
+.hero-stats{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;position:relative;z-index:1;}
+.hstat{background:rgba(13,31,69,.75);border:2px solid rgba(245,197,24,.25);
+  border-radius:16px;padding:14px 22px;text-align:center;
+  box-shadow:0 6px 28px rgba(0,0,0,.45);}
+.hstat-num{font-family:'Playfair Display',serif;font-size:1.6rem;
+  color:var(--gold-light);font-weight:700;}
+.hstat-label{font-size:.63rem;color:var(--text-muted);
+  letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;}
+
+.page-tabs{position:relative;z-index:1;display:flex;
+  padding:0 3vw;border-bottom:2px solid rgba(245,197,24,.18);
+  background:rgba(7,17,42,.95);overflow-x:auto;scrollbar-width:none;
+  box-shadow:0 4px 20px rgba(0,0,0,.4);}
+.page-tabs::-webkit-scrollbar{display:none;}
+.page-tab{padding:15px 16px;font-size:.84rem;font-weight:800;
+  color:var(--text-muted);border-bottom:3px solid transparent;
+  cursor:pointer;white-space:nowrap;transition:all .2s;
+  background:none;border-left:none;border-right:none;border-top:none;
+  font-family:'Mulish',sans-serif;display:flex;align-items:center;gap:7px;}
+.page-tab .tab-icon{font-size:1.5rem;}
+.page-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.page-tab:hover{color:var(--gold-light);}
+
+.page{display:none;position:relative;z-index:1;}
+.page.active{display:block;}
+.section{padding:30px 4vw 64px;}
+.section-title{font-family:'Playfair Display',serif;font-size:1.55rem;
+  color:var(--gold-light);margin-bottom:8px;display:flex;align-items:center;gap:11px;}
+.section-title .sticon{font-size:2rem;}
+.section-line{width:60px;height:3px;
+  background:linear-gradient(90deg,var(--gold),transparent);
+  border-radius:2px;margin-bottom:26px;}
+
+.rates-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;}
+.update-info{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--text-muted);}
+.spinner{width:14px;height:14px;border:2px solid rgba(245,197,24,.2);
+  border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;display:none;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner.active{display:block;}
+
+.rates-table-wrap{
+  background:linear-gradient(180deg,rgba(15,35,80,.95),rgba(10,25,60,.98));
+  border:2px solid rgba(245,197,24,.28);border-radius:20px;
+  overflow:hidden;box-shadow:0 10px 50px rgba(0,0,0,.55);}
+.rates-table{width:100%;border-collapse:collapse;}
+.rates-table thead tr{background:linear-gradient(90deg,rgba(245,197,24,.22),rgba(245,197,24,.08));}
+.rates-table th{padding:15px 18px;font-size:.7rem;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--gold);font-weight:800;text-align:center;}
+.rates-table th:first-child{text-align:left;}
+.rates-table td{padding:17px 18px;border-top:1px solid rgba(245,197,24,.08);
+  vertical-align:middle;text-align:center;}
+.rates-table td:first-child{text-align:left;}
+.rates-table tr:hover td{background:rgba(245,197,24,.07);}
+.cur-cell{display:flex;align-items:center;gap:13px;}
+.cur-flag{font-size:2.1rem;flex-shrink:0;width:36px;text-align:center;}
+.cur-code{font-size:1rem;font-weight:800;color:#fff;}
+.cur-name{font-size:.69rem;color:var(--text-muted);margin-top:2px;}
+.buy-val{font-family:'Playfair Display',serif;font-size:1.4rem;color:#2ecc71;font-weight:700;}
+.sell-val{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--gold-light);font-weight:700;}
+.buy-th{color:#2ecc71 !important;}
+.sell-th{color:var(--gold-light) !important;}
+
+.converter-box{
+  background:linear-gradient(160deg,rgba(13,31,69,.9),rgba(10,25,60,.95));
+  border:2px solid rgba(245,197,24,.25);border-radius:22px;
+  padding:30px 26px;max-width:580px;box-shadow:0 10px 50px rgba(0,0,0,.5);}
+.conv-field{margin-bottom:17px;}
+.conv-field label{font-size:.69rem;letter-spacing:1.8px;text-transform:uppercase;
+  color:var(--text-muted);display:block;margin-bottom:8px;font-weight:800;}
+.conv-field input,.conv-field select{width:100%;padding:13px 16px;
+  background:rgba(7,17,42,.85);border:1.5px solid rgba(245,197,24,.22);
+  border-radius:11px;color:var(--text-light);font-family:'Mulish',sans-serif;
+  font-size:.96rem;outline:none;transition:border-color .2s;}
+.conv-field input:focus,.conv-field select:focus{border-color:var(--gold);}
+.conv-field select option{background:#0D1F45;}
+.conv-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.conv-type-row{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:18px;}
+.type-btn{padding:11px;background:rgba(245,197,24,.07);
+  border:1.5px solid rgba(245,197,24,.22);border-radius:11px;cursor:pointer;
+  color:var(--text-muted);font-size:.84rem;font-weight:800;
+  font-family:'Mulish',sans-serif;transition:all .2s;text-align:center;}
+.type-btn.active.buy{background:rgba(46,204,113,.18);border-color:rgba(46,204,113,.65);color:#2ecc71;}
+.type-btn.active.sell{background:rgba(245,197,24,.18);border-color:rgba(245,197,24,.65);color:var(--gold-light);}
+.swap-btn{width:100%;padding:12px;background:rgba(245,197,24,.12);
+  border:1.5px solid rgba(245,197,24,.28);border-radius:11px;
+  cursor:pointer;color:var(--gold);font-size:.9rem;font-weight:800;
+  transition:all .2s;font-family:'Mulish',sans-serif;margin:10px 0;}
+.swap-btn:hover{background:rgba(245,197,24,.25);}
+.conv-result{margin-top:15px;padding:22px;background:rgba(7,17,42,.75);
+  border-radius:16px;border:1.5px solid rgba(245,197,24,.18);text-align:center;}
+.conv-result-label{font-size:.71rem;color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:1.8px;margin-bottom:9px;}
+.conv-result-value{font-family:'Playfair Display',serif;
+  font-size:2.3rem;color:var(--gold-light);font-weight:700;}
+
+.add-comment-box{
+  background:linear-gradient(160deg,rgba(13,31,69,.9),rgba(10,25,60,.95));
+  border:2px solid rgba(245,197,24,.22);border-radius:22px;padding:26px;
+  margin-bottom:28px;box-shadow:0 10px 45px rgba(0,0,0,.5);}
+.add-comment-box h4{font-family:'Playfair Display',serif;font-size:1.12rem;
+  color:var(--gold-light);margin-bottom:20px;}
+.comment-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+@media(max-width:500px){.comment-form-grid{grid-template-columns:1fr;}}
+.cform-field label{font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text-muted);display:block;margin-bottom:7px;font-weight:700;}
+.cform-field input,.cform-field select,.cform-field textarea{
+  width:100%;padding:12px 15px;background:rgba(7,17,42,.85);
+  border:1.5px solid rgba(245,197,24,.2);border-radius:11px;
+  color:var(--text-light);font-family:'Mulish',sans-serif;
+  font-size:.91rem;outline:none;transition:border-color .2s;resize:none;}
+.cform-field input:focus,.cform-field select:focus,.cform-field textarea:focus{border-color:var(--gold);}
+.cform-field select option{background:#0D1F45;}
+.cform-textarea{margin-bottom:14px;}
+.cform-textarea textarea{min-height:95px;}
+.star-row{display:flex;align-items:center;gap:7px;margin-bottom:17px;}
+.star-row label{font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text-muted);font-weight:700;margin-right:6px;}
+.star{font-size:2rem;cursor:pointer;color:rgba(245,197,24,.2);transition:color .15s,transform .1s;line-height:1;}
+.star.active{color:var(--gold);}
+.star:hover{transform:scale(1.2);}
+.submit-btn{padding:13px 30px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-dim));
+  border:none;border-radius:11px;color:var(--navy);
+  font-family:'Mulish',sans-serif;font-size:.92rem;font-weight:800;
+  cursor:pointer;transition:all .2s;box-shadow:0 6px 22px rgba(245,197,24,.4);}
+.submit-btn:hover{opacity:.88;}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+.comments-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;}
+.comments-badge{background:rgba(245,197,24,.14);border:1.5px solid rgba(245,197,24,.32);
+  color:var(--gold-light);padding:6px 16px;border-radius:20px;font-size:.78rem;font-weight:800;}
+.comments-list{display:flex;flex-direction:column;gap:17px;}
+.comment-card{
+  background:linear-gradient(160deg,rgba(13,31,69,.9),rgba(10,25,60,.95));
+  border:1.5px solid rgba(245,197,24,.15);border-radius:20px;padding:22px 24px;
+  position:relative;animation:fadeUp .4s ease both;box-shadow:0 5px 24px rgba(0,0,0,.35);}
+.comment-card.pinned{border-color:rgba(245,197,24,.6);}
+.comment-card.pinned::before{content:'📌 Закреплено';position:absolute;top:-12px;left:18px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-dim));
+  color:var(--navy);font-size:.64rem;font-weight:800;padding:3px 13px;border-radius:20px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.comment-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:13px;}
+.c-author-block{display:flex;align-items:center;gap:12px;}
+.c-avatar{width:42px;height:42px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold-dim),var(--navy-light));
+  display:flex;align-items:center;justify-content:center;
+  font-size:.95rem;font-weight:800;color:var(--gold-light);
+  flex-shrink:0;border:2px solid rgba(245,197,24,.35);}
+.c-author{font-size:.92rem;font-weight:700;color:#fff;}
+.c-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:3px;}
+.c-date{font-size:.68rem;color:var(--text-muted);}
+.c-cur{font-size:.65rem;font-weight:700;padding:2px 10px;
+  background:rgba(245,197,24,.14);border:1px solid rgba(245,197,24,.28);
+  border-radius:20px;color:var(--gold);}
+.c-text{font-size:.91rem;color:var(--text-light);line-height:1.68;}
+.c-actions{display:flex;gap:8px;flex-shrink:0;}
+.c-action-btn{background:none;border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;padding:4px 10px;cursor:pointer;font-size:.7rem;
+  color:var(--text-muted);font-family:'Mulish',sans-serif;transition:all .2s;white-space:nowrap;}
+.c-action-btn:hover{border-color:rgba(245,197,24,.45);color:var(--gold);}
+.c-action-btn.del:hover{border-color:rgba(231,76,60,.55);color:#e74c3c;}
+.empty-state{text-align:center;padding:55px 20px;color:var(--text-muted);}
+.empty-icon{font-size:3.2rem;margin-bottom:14px;}
+
+.contacts-grid{display:grid;grid-template-columns:1fr;gap:18px;}
+@media(min-width:560px){.contacts-grid{grid-template-columns:1fr 1fr;}}
+.contact-card{
+  background:linear-gradient(160deg,rgba(13,31,69,.9),rgba(10,25,60,.95));
+  border:2px solid rgba(245,197,24,.2);border-radius:22px;
+  padding:28px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 40px rgba(0,0,0,.5);}
+.contact-role{font-size:.67rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;font-weight:800;}
+.contact-name{font-family:'Playfair Display',serif;font-size:1.07rem;color:#fff;line-height:1.4;}
+.c-top{display:flex;align-items:center;gap:15px;}
+.c-avt{width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold-dim),var(--navy-light));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.7rem;border:2px solid rgba(245,197,24,.4);flex-shrink:0;}
+.wa-btn{display:inline-flex;align-items:center;gap:10px;padding:14px 20px;
+  background:linear-gradient(135deg,#25D366,#128C7E);border-radius:13px;
+  text-decoration:none;color:#fff;font-size:.86rem;font-weight:800;
+  transition:all .2s;box-shadow:0 5px 20px rgba(37,211,102,.35);width:100%;justify-content:center;}
+.wa-btn:hover{transform:translateY(-2px);}
+.call-btn{display:inline-flex;align-items:center;gap:10px;padding:13px 20px;
+  background:rgba(245,197,24,.12);border:1.5px solid rgba(245,197,24,.38);
+  border-radius:13px;text-decoration:none;color:var(--gold);
+  font-size:.86rem;font-weight:800;transition:all .2s;width:100%;justify-content:center;}
+.call-btn:hover{background:rgba(245,197,24,.25);}
+.call-btn2{display:inline-flex;align-items:center;gap:10px;padding:13px 20px;
+  background:rgba(245,197,24,.05);border:1.5px solid rgba(245,197,24,.16);
+  border-radius:13px;text-decoration:none;color:var(--text-muted);
+  font-size:.86rem;font-weight:800;transition:all .2s;width:100%;justify-content:center;}
+.call-btn2:hover{color:var(--gold);}
+
+.info-box{
+  background:linear-gradient(160deg,rgba(13,31,69,.9),rgba(10,25,60,.95));
+  border:2px solid rgba(245,197,24,.18);border-radius:22px;padding:28px;
+  margin-top:20px;box-shadow:0 10px 40px rgba(0,0,0,.5);}
+.info-box-icon{font-size:2.2rem;margin-bottom:13px;}
+.info-box h3{font-family:'Playfair Display',serif;font-size:1.08rem;color:var(--gold-light);margin-bottom:15px;}
+.info-row{display:flex;justify-content:space-between;align-items:center;
+  padding:10px 0;border-bottom:1px solid rgba(245,197,24,.09);gap:10px;}
+.info-row:last-child{border-bottom:none;}
+.info-lbl{font-size:.77rem;color:var(--text-muted);flex-shrink:0;}
+.info-val{font-size:.86rem;color:#fff;font-weight:700;text-align:right;}
+.license{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;
+  background:rgba(39,174,96,.12);border:1.5px solid rgba(39,174,96,.35);
+  border-radius:10px;margin-top:14px;font-size:.79rem;color:#2ecc71;font-weight:700;}
+
+.map-wrap{border-radius:20px;overflow:hidden;border:2px solid rgba(245,197,24,.25);
+  margin-top:20px;box-shadow:0 10px 40px rgba(0,0,0,.5);}
+.map-wrap iframe{width:100%;height:340px;border:none;display:block;}
+
+.about-grid{display:grid;grid-template-columns:1fr;gap:18px;}
+@media(min-width:600px){.about-grid{grid-template-columns:1fr 1fr;}}
+.about-info-box{
+  background:linear-gradient(160deg,rgba(13,31,69,.9),rgba(10,25,60,.95));
+  border:2px solid rgba(245,197,24,.2);border-radius:22px;padding:28px;box-shadow:0 10px 40px rgba(0,0,0,.5);}
+.about-info-box .info-box-icon{font-size:2.2rem;margin-bottom:13px;}
+.about-info-box h3{font-family:'Playfair Display',serif;font-size:1.08rem;color:var(--gold-light);margin-bottom:15px;}
+.photos-title{font-family:'Playfair Display',serif;font-size:1.25rem;
+  color:var(--gold-light);margin:36px 0 18px;display:flex;align-items:center;gap:11px;}
+.photos-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:480px){.photos-grid{grid-template-columns:1fr;}}
+.photo-card{border-radius:18px;overflow:hidden;border:2px solid rgba(245,197,24,.22);
+  box-shadow:0 10px 32px rgba(0,0,0,.55);transition:transform .25s;}
+.photo-card:hover{transform:scale(1.025);}
+.photo-card img{width:100%;height:270px;object-fit:cover;display:block;}
+.photo-caption{background:rgba(7,17,42,.96);padding:11px 15px;
+  font-size:.79rem;color:var(--text-muted);font-weight:700;
+  border-top:1px solid rgba(245,197,24,.14);}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);
+  backdrop-filter:blur(10px);z-index:999;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.open{display:flex;}
+.modal-box{
+  background:linear-gradient(160deg,var(--navy-mid),rgba(10,25,60,.98));
+  border:2px solid rgba(245,197,24,.32);border-radius:24px;padding:32px 28px;
+  width:100%;max-width:550px;max-height:90vh;overflow-y:auto;animation:fadeUp .3s ease;
+  box-shadow:0 24px 70px rgba(0,0,0,.7);}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.22rem;
+  color:var(--gold-light);margin-bottom:22px;display:flex;align-items:center;gap:11px;}
+.modal-close{margin-left:auto;background:none;border:none;color:var(--text-muted);font-size:1.6rem;cursor:pointer;}
+.modal-close:hover{color:var(--gold);}
+.modal-input{width:100%;padding:13px 16px;background:rgba(7,17,42,.85);
+  border:1.5px solid rgba(245,197,24,.22);border-radius:11px;
+  color:var(--text-light);font-family:'Mulish',sans-serif;
+  font-size:.96rem;outline:none;transition:border-color .2s;margin-bottom:15px;}
+.modal-input:focus{border-color:var(--gold);}
+.modal-btn{width:100%;padding:14px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-dim));
+  border:none;border-radius:11px;color:var(--navy);
+  font-family:'Mulish',sans-serif;font-size:.93rem;font-weight:800;
+  cursor:pointer;transition:opacity .2s;margin-top:6px;box-shadow:0 5px 20px rgba(245,197,24,.35);}
+.modal-btn:hover{opacity:.87;}
+.modal-btn.sec{background:rgba(245,197,24,.1);color:var(--gold);
+  border:1.5px solid rgba(245,197,24,.3);box-shadow:none;}
+.modal-note{font-size:.75rem;color:var(--text-muted);text-align:center;margin-bottom:17px;line-height:1.6;}
+.modal-step{display:none;}
+.modal-step.active{display:block;}
+.adm-cur{margin:10px 0;background:rgba(7,17,42,.55);
+  border:1px solid rgba(245,197,24,.14);border-radius:13px;padding:17px;}
+.adm-cur-head{font-size:.86rem;font-weight:700;color:var(--gold-light);margin-bottom:13px;}
+.adm-cur-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.adm-field label{font-size:.65rem;letter-spacing:1px;text-transform:uppercase;
+  color:var(--text-muted);display:block;margin-bottom:6px;}
+.adm-field input{width:100%;padding:10px 13px;background:rgba(7,17,42,.85);
+  border:1.5px solid rgba(245,197,24,.2);border-radius:9px;
+  color:var(--text-light);font-family:'Mulish',sans-serif;font-size:.89rem;outline:none;}
+.adm-field input:focus{border-color:var(--gold);}
+
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+  background:rgba(39,174,96,.18);border:1.5px solid rgba(39,174,96,.5);
+  color:#2ecc71;padding:14px 30px;border-radius:50px;font-size:.85rem;font-weight:800;
+  z-index:9999;display:none;white-space:nowrap;animation:fadeUp .3s ease;
+  box-shadow:0 8px 28px rgba(0,0,0,.45);}
+.toast.error{background:rgba(231,76,60,.18);border-color:rgba(231,76,60,.5);color:#e74c3c;}
+
+footer{position:relative;z-index:1;text-align:center;
+  padding:44px 5vw 32px;border-top:2px solid rgba(245,197,24,.14);
+  background:rgba(5,12,32,.98);color:var(--text-muted);font-size:.77rem;line-height:2.1;}
+.footer-logo{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--gold-light);margin-bottom:9px;}
+.footer-year{font-size:.62rem;color:rgba(122,141,176,.4);margin-top:14px;}
+
+@media(max-width:480px){
+  .conv-row{grid-template-columns:1fr;}
+  .rates-table th,.rates-table td{padding:12px 10px;}
+  .buy-val,.sell-val{font-size:1.15rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ADMIN MODAL -->
+<div class="modal-overlay" id="admin-modal">
+  <div class="modal-box">
+    <div class="modal-title">
+      🔐 Администратор
+      <button class="modal-close" id="modal-close">✕</button>
+    </div>
+    <div class="modal-step active" id="step-pwd">
+      <p class="modal-note">Введите пароль для изменения курсов валют</p>
+      <input class="modal-input" type="password" id="admin-pwd-input" placeholder="Пароль">
+      <button class="modal-btn" id="btn-login">Войти</button>
+    </div>
+    <div class="modal-step" id="step-rates">
+      <p class="modal-note">Укажите курс покупки и продажи в сомах (KGS). Оставьте пустым — авто.</p>
+      <div id="adm-rates-grid"></div>
+      <button class="modal-btn" id="btn-save">💾 Сохранить курсы</button>
+      <button class="modal-btn sec" id="btn-logout" style="margin-top:10px;">Выйти</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    <div class="logo-icon">💱</div>
+    <div>
+      <div class="logo-text">Усман Валюта</div>
+      <div class="logo-sub" id="nav-sub">Обменный пункт · Акча алмаштыруу</div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="lang-switcher">
+      <button class="lang-btn active" id="lang-ru" onclick="setLang('ru')">RU</button>
+      <button class="lang-btn" id="lang-kg" onclick="setLang('kg')">KG</button>
+    </div>
+    <div class="dot-live"></div>
+    <span class="nav-clock" id="live-clock">--:--:--</span>
+    <button class="admin-lock-btn" id="open-admin-btn">🔐</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">🏦 ОсОО «Усман Валют» ЖЧК</div>
+  <div class="hero-title">Обмен Валют<br><span>Акча Алмаштыруу</span></div>
+  <div class="hero-sub" id="hero-sub">КПП Бек-Абад · Манас район · Джалал-Абад<br>Кыргызская Республика 🇰🇬 ⇄ 🇺🇿</div>
+  <div class="hero-stats">
+    <div class="hstat"><div class="hstat-num">6</div><div class="hstat-label" id="hs1">Валют</div></div>
+    <div class="hstat"><div class="hstat-num">24/7</div><div class="hstat-label" id="hs2">Онлайн курсы</div></div>
+    <div class="hstat"><div class="hstat-num">100%</div><div class="hstat-label" id="hs3">Официально</div></div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="page-tabs" id="page-tabs">
+  <button class="page-tab active" data-page="rates"><span class="tab-icon">💹</span><span class="tab-label" id="tl-rates">Курсы</span></button>
+  <button class="page-tab" data-page="converter"><span class="tab-icon">🔄</span><span class="tab-label" id="tl-conv">Конвертер</span></button>
+  <button class="page-tab" data-page="comments"><span class="tab-icon">💬</span><span class="tab-label" id="tl-reviews">Отзывы</span></button>
+  <button class="page-tab" data-page="contacts"><span class="tab-icon">📞</span><span class="tab-label" id="tl-contacts">Контакты</span></button>
+  <button class="page-tab" data-page="about"><span class="tab-icon">🏢</span><span class="tab-label" id="tl-about">О нас</span></button>
+</div>
+
+<!-- RATES -->
+<div class="page active" id="page-rates">
+  <div class="section">
+    <div class="rates-top">
+      <div>
+        <div class="section-title"><span class="sticon">💹</span> <span id="t-rates-title">Курсы валют</span></div>
+        <div class="section-line"></div>
+      </div>
+      <div class="update-info">
+        <div class="spinner" id="spinner"></div>
+        <span id="last-update">Загрузка...</span>
+      </div>
+    </div>
+    <p style="font-size:.79rem;color:var(--text-muted);margin-bottom:20px;" id="t-rates-sub">Курсы указаны за 1 единицу валюты в сомах (KGS)</p>
+    <div class="rates-table-wrap">
+      <table class="rates-table">
+        <thead>
+          <tr>
+            <th id="t-col-cur">Валюта</th>
+            <th class="buy-th">📥 <span id="t-col-buy">Покупка</span></th>
+            <th class="sell-th">📤 <span id="t-col-sell">Продажа</span></th>
+          </tr>
+        </thead>
+        <tbody id="rates-tbody">
+          <tr><td colspan="3" style="text-align:center;padding:36px;color:var(--text-muted);">⏳ Загрузка...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- CONVERTER -->
+<div class="page" id="page-converter">
+  <div class="section">
+    <div class="section-title"><span class="sticon">🔄</span> <span id="t-conv-title">Конвертер валют</span></div>
+    <div class="section-line"></div>
+    <div class="converter-box">
+      <div class="conv-type-row">
+        <button class="type-btn active buy" id="type-buy" onclick="setConvType('buy')">📥 <span id="t-buying">Покупаю</span></button>
+        <button class="type-btn sell" id="type-sell" onclick="setConvType('sell')">📤 <span id="t-selling">Продаю</span></button>
+      </div>
+      <div class="conv-field">
+        <label id="t-amount">Сумма</label>
+        <input type="number" id="conv-amount" value="1000" min="0" step="any">
+      </div>
+      <div class="conv-row">
+        <div class="conv-field"><label id="t-from">Из валюты</label><select id="conv-from"></select></div>
+        <div class="conv-field"><label id="t-to">В валюту</label><select id="conv-to"></select></div>
+      </div>
+      <button class="swap-btn" id="swap-btn">⇄ <span id="t-swap">Поменять местами</span></button>
+      <div class="conv-result">
+        <div class="conv-result-label" id="t-result">Результат конвертации</div>
+        <div class="conv-result-value" id="conv-result">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMMENTS -->
+<div class="page" id="page-comments">
+  <div class="section">
+    <div class="comments-header">
+      <div>
+        <div class="section-title"><span class="sticon">💬</span> <span id="t-reviews-title">Отзывы клиентов</span></div>
+        <div class="section-line"></div>
+      </div>
+      <span class="comments-badge" id="comments-count">0 отзывов</span>
+    </div>
+    <div class="add-comment-box">
+      <h4>✍️ <span id="t-leave-review">Оставить отзыв об обмене</span></h4>
+      <div class="comment-form-grid">
+        <div class="cform-field">
+          <label id="t-your-name">Ваше имя</label>
+          <input type="text" id="c-author" placeholder="Аноним" maxlength="80">
+        </div>
+        <div class="cform-field">
+          <label id="t-exc-cur">Валюта обмена</label>
+          <select id="c-currency">
+            <option value="">— Любая —</option>
+            <option value="USD">🇺🇸 USD</option>
+            <option value="EUR">🇪🇺 EUR</option>
+            <option value="RUB">🇷🇺 RUB</option>
+            <option value="UZS">🇺🇿 UZS</option>
+            <option value="KZT">🇰🇿 KZT</option>
+            <option value="CNY">🇨🇳 CNY</option>
+          </select>
+        </div>
+      </div>
+      <div class="star-row">
+        <label id="t-rating">Оценка:</label>
+        <span class="star active" data-v="1">★</span>
+        <span class="star active" data-v="2">★</span>
+        <span class="star active" data-v="3">★</span>
+        <span class="star active" data-v="4">★</span>
+        <span class="star active" data-v="5">★</span>
+      </div>
+      <div class="cform-field cform-textarea">
+        <label id="t-your-review">Ваш отзыв</label>
+        <textarea id="c-text" placeholder="Напишите о своём опыте обмена..." maxlength="500"></textarea>
+      </div>
+      <button class="submit-btn" id="submit-comment">📨 <span id="t-send">Отправить отзыв</span></button>
+    </div>
+    <div class="comments-list" id="comments-list">
+      <div class="empty-state"><div class="empty-icon">💬</div><p>Загрузка отзывов...</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACTS -->
+<div class="page" id="page-contacts">
+  <div class="section">
+    <div class="section-title"><span class="sticon">📞</span> <span id="t-contacts-title">Контакты</span></div>
+    <div class="section-line"></div>
+    <div class="contacts-grid">
+      <div class="contact-card">
+        <div class="c-top">
+          <div class="c-avt">👔</div>
+          <div>
+            <div class="contact-role" id="t-director">Директор</div>
+            <div class="contact-name">Ахмаджанов<br>Мухаммат Мансурович</div>
+          </div>
+        </div>
+        <a class="wa-btn" href="https://wa.me/996559750058" target="_blank">📲 WhatsApp: +996 559 750 058</a>
+        <a class="call-btn" href="tel:+996559750058">📞 +996 559 750 058</a>
+      </div>
+      <div class="contact-card">
+        <div class="c-top">
+          <div class="c-avt">💼</div>
+          <div>
+            <div class="contact-role" id="t-cashier">Кассир</div>
+            <div class="contact-name">Ахматжанов<br>Абубакир Мансурович</div>
+          </div>
+        </div>
+        <a class="call-btn" href="tel:+996222707700">📞 +996 222 70 77 00</a>
+        <a class="call-btn2" href="tel:+996662113171">📞 +996 662 11 31 71</a>
+      </div>
+    </div>
+    <div class="info-box">
+      <div class="info-box-icon">📍</div>
+      <h3 id="t-addr-title">Адрес и режим работы</h3>
+      <div class="info-row"><span class="info-lbl" id="t-city">Город</span><span class="info-val">г. Манас</span></div>
+      <div class="info-row"><span class="info-lbl" id="t-dist">Район</span><span class="info-val">Бек-Абад</span></div>
+      <div class="info-row"><span class="info-lbl" id="t-obj">Объект</span><span class="info-val" id="t-bpost">Пограничный пост Кыргызской Республики</span></div>
+      <div class="info-row"><span class="info-lbl" id="t-reg">Область</span><span class="info-val">Джалал-Абадская область</span></div>
+      <div class="info-row"><span class="info-lbl" id="t-bord">Граница</span><span class="info-val">🇰🇬 Кыргызстан ⇄ 🇺🇿 Узбекистан</span></div>
+      <div class="info-row"><span class="info-lbl" id="t-work">Режим работы</span><span class="info-val">Ежедневно 08:00 – 20:00</span></div>
+    </div>
+    <div class="map-wrap">
+      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3041.2!2d71.2512!3d40.5321!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38bb4b0000000001%3A0x1!2z0JrQn9CfINCR0LXQutC-0LDQsdCw0LQg0JrRi9GA0LPRi9C30YHRgtCw0L0!5e0!3m2!1sru!2skg!4v1"
+        allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="page" id="page-about">
+  <div class="section">
+    <div class="section-title"><span class="sticon">🏢</span> <span id="t-about-title">О компании</span></div>
+    <div class="section-line"></div>
+    <div class="about-grid">
+      <div class="about-info-box">
+        <div class="info-box-icon">🏦</div>
+        <h3>Усман Валюта</h3>
+        <div class="info-row"><span class="info-lbl" id="t-type">Тип</span><span class="info-val" id="t-official">Официальный обменник</span></div>
+        <div class="info-row"><span class="info-lbl" id="t-curs">Валюты</span><span class="info-val">USD · EUR · RUB · UZS · KZT · CNY</span></div>
+        <div class="info-row"><span class="info-lbl" id="t-loc">Локация</span><span class="info-val">КПП Бек-Абад, г. Манас</span></div>
+        <div class="license">✅ <span id="t-lic">Все юридические разрешения получены</span></div>
+      </div>
+      <div class="about-info-box">
+        <div class="info-box-icon">🛂</div>
+        <h3 id="t-border-point">Пограничный пункт</h3>
+        <div class="info-row"><span class="info-lbl">КПП</span><span class="info-val">Бек-Абад</span></div>
+        <div class="info-row"><span class="info-lbl" id="t-dist2">Район</span><span class="info-val">Манас</span></div>
+        <div class="info-row"><span class="info-lbl" id="t-bord2">Граница</span><span class="info-val">КР — Узбекистан</span></div>
+        <div class="info-row"><span class="info-lbl">КР тарабынан</span><span class="info-val">🇰🇬 Тейлейбиз</span></div>
+        <div class="info-row"><span class="info-lbl">УЗ тарабынан</span><span class="info-val">🇺🇿 Тейлейбиз</span></div>
+      </div>
+    </div>
+    <div class="photos-title">📸 <span id="t-our-office">Наш обменный пункт</span></div>
+    <div class="photos-grid">
+      <div class="photo-card">
+        <img src="/static/shop1.jpg" alt="Усман Валюта"
+          onerror="this.style.display='none';this.nextElementSibling.textContent='📷 Фото скоро появится'">
+        <div class="photo-caption">🏦 Усман Валюта — главный вход</div>
+      </div>
+      <div class="photo-card">
+        <img src="/static/shop2.jpg" alt="Усман Валюта курсы"
+          onerror="this.style.display='none';this.nextElementSibling.textContent='📷 Фото скоро появится'">
+        <div class="photo-caption">💱 Таблица курсов валют</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">💱 Усман Валюта</div>
+  <div>г. Манас · КПП Бек-Абад · Джалал-Абадская область · Кыргызская Республика</div>
+  <div>🇰🇬 ⇄ 🇺🇿 · Все разрешения получены · 📞 +996 559 750 058</div>
+  <div style="font-size:.73rem;color:var(--text-muted);margin-top:4px;">Курсы носят информационный характер. Точный курс уточняйте у оператора.</div>
+  <div class="footer-year">© Усман Валюта · с 2022 года</div>
+</footer>
+
+<script>
+const I18N={
+  ru:{
+    nav_sub:'Обменный пункт · Акча алмаштыруу',
+    hero_sub:'КПП Бек-Абад · Манас район · Джалал-Абад<br>Кыргызская Республика 🇰🇬 ⇄ 🇺🇿',
+    hs1:'Валют',hs2:'Онлайн курсы',hs3:'Официально',
+    tl_rates:'Курсы',tl_conv:'Конвертер',tl_reviews:'Отзывы',tl_contacts:'Контакты',tl_about:'О нас',
+    rates_title:'Курсы валют',rates_sub:'Курсы указаны за 1 единицу валюты в сомах (KGS)',
+    col_cur:'Валюта',col_buy:'Покупка',col_sell:'Продажа',
+    conv_title:'Конвертер валют',buying:'Покупаю',selling:'Продаю',
+    amount:'Сумма',from:'Из валюты',to:'В валюту',swap:'Поменять местами',result:'Результат конвертации',
+    reviews_title:'Отзывы клиентов',leave_review:'Оставить отзыв об обмене',
+    your_name:'Ваше имя',exc_cur:'Валюта обмена',rating:'Оценка:',your_review:'Ваш отзыв',send:'Отправить отзыв',
+    contacts_title:'Контакты',director:'Директор',cashier:'Кассир',
+    addr_title:'Адрес и режим работы',city:'Город',dist:'Район',obj:'Объект',
+    bpost:'Пограничный пост Кыргызской Республики',reg:'Область',bord:'Граница',work:'Режим работы',
+    about_title:'О компании',type:'Тип',official:'Официальный обменник',curs:'Валюты',loc:'Локация',
+    lic:'Все юридические разрешения получены',border_point:'Пограничный пункт',our_office:'Наш обменный пункт',
+    kgs:'Кыргызский сом',reviews_count:'отзывов',
+  },
+  kg:{
+    nav_sub:'Акча алмаштыруу · Обменный пункт',
+    hero_sub:'КПП Бек-Абад · Манас району · Жалал-Абад<br>Кыргыз Республикасы 🇰🇬 ⇄ 🇺🇿',
+    hs1:'Валюта',hs2:'Онлайн курс',hs3:'Расмий',
+    tl_rates:'Курстар',tl_conv:'Конвертер',tl_reviews:'Пикирлер',tl_contacts:'Байланыш',tl_about:'Биз жөнүндө',
+    rates_title:'Валюта курстары',rates_sub:'Курстар 1 валюта бирдиги үчүн сомдо (KGS)',
+    col_cur:'Валюта',col_buy:'Сатып алуу',col_sell:'Сатуу',
+    conv_title:'Валюта конвертери',buying:'Сатып алам',selling:'Сатам',
+    amount:'Сумма',from:'Кайсы валютадан',to:'Кайсы валютага',swap:'Алмаштыруу',result:'Конверттөө жыйынтыгы',
+    reviews_title:'Кардарлардын пикири',leave_review:'Алмашуу жөнүндө пикир калтыруу',
+    your_name:'Сиздин атыңыз',exc_cur:'Алмашуу валютасы',rating:'Баа:',your_review:'Сиздин пикириңиз',send:'Пикир жөнөтүү',
+    contacts_title:'Байланыш',director:'Директор',cashier:'Кассир',
+    addr_title:'Дарек жана иш убактысы',city:'Шаар',dist:'Район',obj:'Объект',
+    bpost:'Кыргыз Республикасынын чек ара посту',reg:'Облус',bord:'Чек ара',work:'Иш убактысы',
+    about_title:'Компания жөнүндө',type:'Түрү',official:'Расмий алмаштыруу пункту',curs:'Валюталар',loc:'Жайгашкан жери',
+    lic:'Бардык юридикалык уруксаттар алынган',border_point:'Чек ара пункту',our_office:'Биздин алмаштыруу пунктубуз',
+    kgs:'Кыргыз сому',reviews_count:'пикир',
+  }
+};
+
+const CURRENCIES=[
+  {code:'USD',flag:'🇺🇸',name:{ru:'Доллар США',kg:'АКШ доллары'}},
+  {code:'EUR',flag:'🇪🇺',name:{ru:'Евро',kg:'Евро'}},
+  {code:'RUB',flag:'🇷🇺',name:{ru:'Российский рубль',kg:'Россия рублу'}},
+  {code:'UZS',flag:'🇺🇿',name:{ru:'Узбекский сум',kg:'Өзбек сому'}},
+  {code:'KZT',flag:'🇰🇿',name:{ru:'Казахстанский тенге',kg:'Казак тенгеси'}},
+  {code:'CNY',flag:'🇨🇳',name:{ru:'Китайский юань',kg:'Кытай юани'}},
+];
+const codeMap=Object.fromEntries(CURRENCIES.map(c=>[c.code,c]));
+
+let lang='ru',convType='buy',ratesData={},adminPassword='',isAdmin=false,selectedRating=5,lastComments=[];
+
+function showToast(msg,isError=false){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className='toast'+(isError?' error':'');el.style.display='block';
+  clearTimeout(el._t);el._t=setTimeout(()=>{el.style.display='none';},3200);
+}
+
+function applyLang(l){
+  const t=I18N[l];
+  document.getElementById('nav-sub').textContent=t.nav_sub;
+  document.getElementById('hero-sub').innerHTML=t.hero_sub;
+  document.getElementById('hs1').textContent=t.hs1;
+  document.getElementById('hs2').textContent=t.hs2;
+  document.getElementById('hs3').textContent=t.hs3;
+  document.getElementById('tl-rates').textContent=t.tl_rates;
+  document.getElementById('tl-conv').textContent=t.tl_conv;
+  document.getElementById('tl-reviews').textContent=t.tl_reviews;
+  document.getElementById('tl-contacts').textContent=t.tl_contacts;
+  document.getElementById('tl-about').textContent=t.tl_about;
+  document.getElementById('t-rates-title').textContent=t.rates_title;
+  document.getElementById('t-rates-sub').textContent=t.rates_sub;
+  document.getElementById('t-col-cur').textContent=t.col_cur;
+  document.getElementById('t-col-buy').textContent=t.col_buy;
+  document.getElementById('t-col-sell').textContent=t.col_sell;
+  document.getElementById('t-conv-title').textContent=t.conv_title;
+  document.getElementById('t-buying').textContent=t.buying;
+  document.getElementById('t-selling').textContent=t.selling;
+  document.getElementById('t-amount').textContent=t.amount;
+  document.getElementById('t-from').textContent=t.from;
+  document.getElementById('t-to').textContent=t.to;
+  document.getElementById('t-swap').textContent=t.swap;
+  document.getElementById('t-result').textContent=t.result;
+  document.getElementById('t-reviews-title').textContent=t.reviews_title;
+  document.getElementById('t-leave-review').textContent=t.leave_review;
+  document.getElementById('t-your-name').textContent=t.your_name;
+  document.getElementById('t-exc-cur').textContent=t.exc_cur;
+  document.getElementById('t-rating').textContent=t.rating;
+  document.getElementById('t-your-review').textContent=t.your_review;
+  document.getElementById('t-send').textContent=t.send;
+  document.getElementById('t-contacts-title').textContent=t.contacts_title;
+  document.getElementById('t-director').textContent=t.director;
+  document.getElementById('t-cashier').textContent=t.cashier;
+  document.getElementById('t-addr-title').textContent=t.addr_title;
+  document.getElementById('t-city').textContent=t.city;
+  document.getElementById('t-dist').textContent=t.dist;
+  document.getElementById('t-obj').textContent=t.obj;
+  document.getElementById('t-bpost').textContent=t.bpost;
+  document.getElementById('t-reg').textContent=t.reg;
+  document.getElementById('t-bord').textContent=t.bord;
+  document.getElementById('t-work').textContent=t.work;
+  document.getElementById('t-about-title').textContent=t.about_title;
+  document.getElementById('t-type').textContent=t.type;
+  document.getElementById('t-official').textContent=t.official;
+  document.getElementById('t-curs').textContent=t.curs;
+  document.getElementById('t-loc').textContent=t.loc;
+  document.getElementById('t-lic').textContent=t.lic;
+  document.getElementById('t-border-point').textContent=t.border_point;
+  document.getElementById('t-dist2').textContent=t.dist;
+  document.getElementById('t-bord2').textContent=t.bord;
+  document.getElementById('t-our-office').textContent=t.our_office;
+}
+
+function setLang(l){
+  lang=l;
+  document.getElementById('lang-ru').classList.toggle('active',l==='ru');
+  document.getElementById('lang-kg').classList.toggle('active',l==='kg');
+  applyLang(l);
+  renderRates();
+  populateSelects();
+  renderComments(lastComments);
+}
+
+function updateClock(){
+  document.getElementById('live-clock').textContent=new Date().toLocaleTimeString('ru-RU',{hour12:false});
+}
+updateClock();setInterval(updateClock,1000);
+
+function fmt(n){
+  if(n===null||n===undefined||isNaN(n))return'—';
+  const v=parseFloat(n);
+  if(v>=10)return v.toFixed(2);
+  if(v>=1)return v.toFixed(3);
+  if(v>=0.001)return v.toFixed(4);
+  return v.toFixed(6);
+}
+
+async function fetchRates(){
+  document.getElementById('spinner').classList.add('active');
+  try{
+    const res=await fetch('/api/rates/');
+    if(!res.ok)throw new Error();
+    const data=await res.json();
+    ratesData=data.rates||{};
+    renderRates();renderConverter();
+    const now=new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    document.getElementById('last-update').textContent='Обновлено: '+now;
+  }catch{document.getElementById('last-update').textContent='⚠ Ошибка загрузки';}
+  finally{document.getElementById('spinner').classList.remove('active');}
+}
+
+function renderRates(){
+  document.getElementById('rates-tbody').innerHTML=CURRENCIES.map(cur=>{
+    const r=ratesData[cur.code]||{};
+    return`<tr>
+      <td><div class="cur-cell">
+        <div class="cur-flag">${cur.flag}</div>
+        <div><div class="cur-code">${cur.code}</div><div class="cur-name">${cur.name[lang]}</div></div>
+      </div></td>
+      <td><span class="buy-val">${r.buy!=null?fmt(r.buy):'—'}</span></td>
+      <td><span class="sell-val">${r.sell!=null?fmt(r.sell):'—'}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function populateSelects(){
+  const kgsName=I18N[lang].kgs;
+  const opts=CURRENCIES.map(c=>`<option value="${c.code}">${c.flag} ${c.code} — ${c.name[lang]}</option>`).join('')
+    +`<option value="KGS">🇰🇬 KGS — ${kgsName}</option>`;
+  const f=document.getElementById('conv-from'),t=document.getElementById('conv-to');
+  const pf=f.value||'USD',pt=t.value||'KGS';
+  f.innerHTML=opts;t.innerHTML=opts;
+  f.value=pf;t.value=pt;
+  if(!f.value)f.value='USD';if(!t.value)t.value='KGS';
+  renderConverter();
+}
+
+function setConvType(tp){
+  convType=tp;
+  document.getElementById('type-buy').className='type-btn'+(tp==='buy'?' active buy':'');
+  document.getElementById('type-sell').className='type-btn sell'+(tp==='sell'?' active sell':'');
+  renderConverter();
+}
+
+function renderConverter(){
+  const amt=parseFloat(document.getElementById('conv-amount').value)||0;
+  const from=document.getElementById('conv-from').value;
+  const to=document.getElementById('conv-to').value;
+  function toKGS(code,a){if(code==='KGS')return a;const r=ratesData[code];if(!r)return null;return a*(convType==='buy'?r.buy:r.sell);}
+  function fromKGS(code,k){if(code==='KGS')return k;const r=ratesData[code];if(!r)return null;return k/(convType==='buy'?r.buy:r.sell);}
+  const kgs=toKGS(from,amt);
+  if(kgs===null){document.getElementById('conv-result').textContent='—';return;}
+  const res=fromKGS(to,kgs);
+  if(res===null){document.getElementById('conv-result').textContent='—';return;}
+  const cur=to==='KGS'?{flag:'🇰🇬',code:'KGS'}:(codeMap[to]||{flag:'',code:to});
+  document.getElementById('conv-result').textContent=
+    `${cur.flag} ${res.toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:4})} ${to}`;
+}
+
+document.getElementById('conv-amount').addEventListener('input',renderConverter);
+document.getElementById('conv-from').addEventListener('change',renderConverter);
+document.getElementById('conv-to').addEventListener('change',renderConverter);
+document.getElementById('swap-btn').addEventListener('click',()=>{
+  const f=document.getElementById('conv-from'),t=document.getElementById('conv-to');
+  [f.value,t.value]=[t.value,f.value];renderConverter();
+});
+
+document.getElementById('page-tabs').addEventListener('click',e=>{
+  const btn=e.target.closest('.page-tab');if(!btn)return;
+  document.querySelectorAll('.page-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('page-'+btn.dataset.page).classList.add('active');
+  if(btn.dataset.page==='comments')fetchComments();
+});
+
+const modal=document.getElementById('admin-modal');
+function openModal(){modal.classList.add('open');showStep('step-pwd');document.getElementById('admin-pwd-input').value='';}
+function closeModal(){modal.classList.remove('open');}
+function showStep(id){document.querySelectorAll('.modal-step').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+document.getElementById('open-admin-btn').addEventListener('click',openModal);
+document.getElementById('modal-close').addEventListener('click',closeModal);
+modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
+
+document.getElementById('btn-login').addEventListener('click',async()=>{
+  const pwd=document.getElementById('admin-pwd-input').value.trim();
+  if(!pwd){showToast('Введите пароль',true);return;}
+  try{
+    const res=await fetch('/api/admin/check/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});
+    if(res.ok){adminPassword=pwd;isAdmin=true;await loadAdminRates();showStep('step-rates');renderComments(lastComments);}
+    else showToast('❌ Неверный пароль',true);
+  }catch{showToast('❌ Ошибка соединения',true);}
+});
+
+async function loadAdminRates(){
+  let saved={};
+  try{const res=await fetch('/api/admin/rates/');const data=await res.json();saved=data.rates||{};}catch{}
+  document.getElementById('adm-rates-grid').innerHTML=CURRENCIES.map(cur=>`
+    <div class="adm-cur">
+      <div class="adm-cur-head">${cur.flag} ${cur.code} — ${cur.name[lang]}</div>
+      <div class="adm-cur-row">
+        <div class="adm-field"><label>Покупка (KGS)</label>
+          <input type="number" step="any" min="0" id="rb-${cur.code}" placeholder="авто" value="${saved[cur.code]?.buy||''}"></div>
+        <div class="adm-field"><label>Продажа (KGS)</label>
+          <input type="number" step="any" min="0" id="rs-${cur.code}" placeholder="авто" value="${saved[cur.code]?.sell||''}"></div>
+      </div>
+    </div>`).join('');
+}
+
+document.getElementById('btn-save').addEventListener('click',async()=>{
+  const rates={};
+  CURRENCIES.forEach(cur=>{
+    const b=document.getElementById('rb-'+cur.code)?.value.trim();
+    const s=document.getElementById('rs-'+cur.code)?.value.trim();
+    if(b||s)rates[cur.code]={buy:b?parseFloat(b):null,sell:s?parseFloat(s):null};
+  });
+  try{
+    const res=await fetch('/api/admin/save/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:adminPassword,rates})});
+    if(res.ok){showToast('✅ Курсы сохранены!');closeModal();fetchRates();}
+    else showToast('❌ Ошибка сохранения',true);
+  }catch{showToast('❌ Ошибка соединения',true);}
+});
+
+document.getElementById('btn-logout').addEventListener('click',()=>{isAdmin=false;adminPassword='';closeModal();renderComments(lastComments);});
+
+document.querySelectorAll('.star').forEach(star=>{
+  star.addEventListener('click',()=>{
+    selectedRating=parseInt(star.dataset.v);
+    document.querySelectorAll('.star').forEach(s=>s.classList.toggle('active',parseInt(s.dataset.v)<=selectedRating));
+  });
+});
+
+async function fetchComments(){
+  try{
+    const res=await fetch('/api/comments/');
+    const data=await res.json();
+    lastComments=data.comments||[];
+    renderComments(lastComments);
+  }catch{
+    document.getElementById('comments-list').innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><p>Ошибка загрузки отзывов</p></div>';
+  }
+}
+
+function starsHtml(n){let h='';for(let i=1;i<=5;i++)h+=`<span style="color:${i<=n?'var(--gold)':'rgba(245,197,24,.18)'}">★</span>`;return h;}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+function renderComments(list){
+  const el=document.getElementById('comments-list');
+  const badge=document.getElementById('comments-count');
+  badge.textContent=list.length+' '+(I18N[lang].reviews_count||'отзывов');
+  if(!list.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">💬</div><p>Отзывов пока нет. Будьте первым!</p></div>';return;}
+  el.innerHTML=list.map((c,i)=>{
+    const init=(c.author||'А').charAt(0).toUpperCase();
+    const adm=isAdmin?`<div class="c-actions">
+      <button class="c-action-btn" onclick="pinComment(${c.id})">${c.pinned?'📌 Открепить':'📌 Закрепить'}</button>
+      <button class="c-action-btn del" onclick="delComment(${c.id})">🗑 Удалить</button>
+    </div>`:'';
+    const cur=c.currency?`<span class="c-cur">${c.currency}</span>`:'';
+    return`<div class="comment-card${c.pinned?' pinned':''}" style="animation-delay:${i*0.05}s">
+      <div class="comment-top">
+        <div class="c-author-block">
+          <div class="c-avatar">${init}</div>
+          <div>
+            <div class="c-author">${esc(c.author)}</div>
+            <div class="c-meta"><span class="c-date">${c.created_at}</span>${cur}<span class="c-stars">${starsHtml(c.rating)}</span></div>
+          </div>
+        </div>${adm}
+      </div>
+      <div class="c-text">${esc(c.text)}</div>
+    </div>`;
+  }).join('');
+}
+
+async function delComment(id){
+  if(!confirm('Удалить этот отзыв?'))return;
+  try{
+    const res=await fetch('/api/comments/delete/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:adminPassword,id})});
+    if(res.ok){showToast('🗑 Удалено');fetchComments();}else showToast('❌ Ошибка',true);
+  }catch{showToast('❌ Ошибка соединения',true);}
+}
+
+async function pinComment(id){
+  try{
+    const res=await fetch('/api/comments/pin/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:adminPassword,id})});
+    if(res.ok){const d=await res.json();showToast(d.pinned?'📌 Закреплено':'📌 Откреплено');fetchComments();}
+    else showToast('❌ Ошибка',true);
+  }catch{showToast('❌ Ошибка соединения',true);}
+}
+
+document.getElementById('submit-comment').addEventListener('click',async()=>{
+  const text=document.getElementById('c-text').value.trim();
+  if(!text){showToast('✏ Напишите текст отзыва',true);return;}
+  const author=document.getElementById('c-author').value.trim()||'Аноним';
+  const currency=document.getElementById('c-currency').value;
+  const btn=document.getElementById('submit-comment');
+  btn.disabled=true;
+  try{
+    const res=await fetch('/api/comments/add/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({author,text,currency,rating:selectedRating})});
+    if(res.ok){
+      showToast('✅ Отзыв отправлен!');
+      document.getElementById('c-text').value='';
+      document.getElementById('c-author').value='';
+      document.getElementById('c-currency').value='';
+      selectedRating=5;
+      document.querySelectorAll('.star').forEach(s=>s.classList.add('active'));
+      fetchComments();
+    }else showToast('❌ Ошибка отправки',true);
+  }catch{showToast('❌ Ошибка соединения',true);}
+  finally{btn.disabled=false;}
+});
+
+populateSelects();
+fetchRates();
+setInterval(fetchRates,60000);
+fetchComments();
+</script>
+</body>
+</html>
